@@ -1,0 +1,62 @@
+#right-menu {
+  height: 100%;
+  background: var(--background-color-light);
+
+  display: flex;
+  flex-direction: row;
+
+  transition: width 0.3s ease, min-width 0.3s ease;
+  &.open {
+    width: 370px;
+    min-width: 370px;
+    @media (max-width: 768px) {
+      position: absolute;
+      right: 0;
+    }
+  }
+  &.closed {
+    width: 60px;
+    min-width: 60px;
+    .big-section {
+      width: 0px;
+      overflow: hidden;
+      padding: 0px;
+      border-width: 0px;
+    }
+  }
+
+  .big-section {
+    border-left: 1px solid rgba(0, 0, 0, 0.13);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 2px;
+    color: var(--ion-color-light-shade);
+    .section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 16px;
+      & > ion-label {
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+  .small-section {
+    border-left: 1px solid rgba(0, 0, 0, 0.13);
+    width: 60px;
+    min-width: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    button {
+      --nextui-radius-medium: 0px;
+      width: 56px;
+      height: 36px;
+      font-size: 30px;
+    }
+  }
+}

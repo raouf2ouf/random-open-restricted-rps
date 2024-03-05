@@ -1,0 +1,15 @@
+.game-selector-container {
+  width: 150px;
+  div[data-slot="mainWrapper"] > button {
+    background-color: transparent !important;
+  }
+  span[data-slot="value"] {
+    text-align: center;
+    color: var(--ion-color-primary-shade) !important;
+  }
+}
+
+.game-select-content {
+  border-radius: 0px !important;
+  background: var(--background-color-light);
+}

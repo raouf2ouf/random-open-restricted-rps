@@ -1,0 +1,11 @@
+.chain-selector-container {
+  width: 130px;
+  div[data-slot="mainWrapper"] > button {
+    background-color: transparent !important;
+  }
+}
+
+.chain-select-content {
+  border-radius: 0px !important;
+  background: var(--background-color-light);
+}

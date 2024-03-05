@@ -1,0 +1,38 @@
+.home-page {
+  padding: 24px !important;
+  line-height: 1.7rem;
+  .title {
+    opacity: 0.9;
+    color: var(--ion-color-primary-shade);
+    font-size: 32px;
+  }
+  .subtitle {
+    opacity: 0.9;
+    color: var(--ion-color-light-shade);
+    font-size: 28px;
+    margin: 16px 0px;
+  }
+  .subsection-title {
+    width: 100%;
+    margin-top: 24px;
+    font-size: 24px;
+    text-align: left;
+    color: var(--ion-color-light-shade);
+  }
+
+  .content {
+    width: 100%;
+    padding: 8px;
+    color: var(--ion-color-medium-tint);
+    p:first-child {
+      margin-top: 0px;
+    }
+    p {
+      text-align: justify;
+    }
+  }
+  // .tldr {
+  //   opacity: 1;
+  //   color: var(--ion-color-light-shade);
+  // }
+}
