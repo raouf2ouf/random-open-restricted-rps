@@ -1,5 +1,5 @@
 import {
-  selectAllOpenGamesJoinedByCurrentPlayer,
+  selectAllOpenGamesIdsJoinedByCurrentPlayer,
   selectOpenGameById,
 } from "@/store/openGames.slice";
 import { setCurrentGameGlobalId } from "@/store/playersState.slice";
@@ -24,6 +24,7 @@ const JoinedGameDisplay: React.FC<Props> = ({ gameGlobalId }) => {
     <>
       {game && (
         <div className="game">
+          {/* {game.gameAddress} */}
           <div className="game-id column">
             <div className="label">
               <span className="hide-md">Game </span>ID
@@ -64,7 +65,7 @@ const JoinedGameDisplayMemo = memo(JoinedGameDisplay);
 
 const JoinedGames: React.FC = () => {
   const joinedGames = useAppSelector((state) =>
-    selectAllOpenGamesJoinedByCurrentPlayer(state)
+    selectAllOpenGamesIdsJoinedByCurrentPlayer(state)
   );
   return (
     <>

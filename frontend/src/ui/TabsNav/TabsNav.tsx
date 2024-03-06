@@ -45,7 +45,7 @@ const TabsNav: React.FC<Props> = ({}) => {
             </div>
           }
         ></Tab>
-        {/*  <Tab
+        <Tab
           key="/matches"
           title={
             <div className="tab-button">
@@ -54,15 +54,15 @@ const TabsNav: React.FC<Props> = ({}) => {
             </div>
           }
         ></Tab>
-        <Tab
+        {/* <Tab
           key="/offers"
           title={
             <div className="tab-button">
               <MdLocalOffer />
               <div>Offers</div>
             </div>
-          }
-        ></Tab> */}
+          } 
+        ></Tab>*/}
       </Tabs>
     </div>
   );

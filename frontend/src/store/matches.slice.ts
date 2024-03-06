@@ -36,9 +36,10 @@ const getMatchesForGame = async (
     const m: IMatch = {
       id: buildMatchId(gameGlobalId, i),
       gameGlobalId,
+      gameId: gameGlobalId.split("-")[2],
       matchId: i,
-      player1: d.player1,
-      player2: d.player2,
+      player1: d.realPlayer1Id,
+      player2: d.realPlayer2Id,
       player1Card: d.player1Card,
       player2Card: d.player2Card,
       player1Bet: d.player1Bet,

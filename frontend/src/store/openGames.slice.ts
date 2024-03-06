@@ -19,7 +19,11 @@ import { readContract } from "wagmi/actions";
 import GAME_CONTRACT from "@/contracts/RestrictedRPSGame.json";
 import FACTORY_CONTRACT from "@/contracts/RestrictedRPSFactory.json";
 import { fetchMatchesForGame } from "./matches.slice";
-import { fetchPlayersStateForGame } from "./playersState.slice";
+import {
+  fetchPlayersStateForGame,
+  selectCurrentGameGlobalId,
+  setCurrentGameGlobalId,
+} from "./playersState.slice";
 
 const { abi: GAME_ABI } = GAME_CONTRACT;
 const { abi: FACTORY_ABI } = FACTORY_CONTRACT;
@@ -76,6 +80,7 @@ export const fetchOpenGamesInfo = createAsyncThunk(
     const playerAddress = (thunkAPI.getState() as RootState).playersState
       .playerAddress;
 
+    let currentGame: IGame | undefined;
     for (const address of data) {
       const gameAddress = address.toLowerCase();
       const game: IGame | undefined = await fetchGameInfo(
@@ -85,11 +90,17 @@ export const fetchOpenGamesInfo = createAsyncThunk(
       if (game) {
         games.push(game);
         if (game.playerId >= 0) {
+          if (!currentGame) currentGame = game;
+
           thunkAPI.dispatch(
             fetchMatchesForGame({ gameAddress, gameGlobalId: game.id })
           );
         }
       }
+    }
+
+    if (currentGame) {
+      thunkAPI.dispatch(setCurrentGameGlobalId(currentGame.id));
     }
 
     return games;
@@ -150,6 +161,32 @@ export const gameJoined = createAsyncThunk(
   }
 );
 
+export const playerWasGivenCards = createAsyncThunk(
+  "openGames/playerWasGivenCards",
+  async (
+    {
+      gameAddress,
+      gameGlobalId,
+      playerId,
+    }: {
+      gameAddress: string;
+      gameGlobalId: string;
+      playerId: number;
+    },
+    thunkAPI
+  ): Promise<IGame | undefined> => {
+    const state = thunkAPI.getState() as RootState;
+    const playerAddress = state.playersState.playerAddress;
+    const game: IGame | undefined = await fetchGameInfo(
+      gameAddress,
+      playerAddress
+    );
+    thunkAPI.dispatch(fetchPlayersStateForGame({ gameAddress, gameGlobalId }));
+
+    return game;
+  }
+);
+
 // Adapter
 const openGamesAdapter = createEntityAdapter<IGame>({
   sortComparer: (a, b) => Number(BigInt(a.gameId) - BigInt(b.gameId)),
@@ -159,7 +196,15 @@ const openGamesAdapter = createEntityAdapter<IGame>({
 export const { selectAll: selectAllOpenGames, selectById: selectOpenGameById } =
   openGamesAdapter.getSelectors((state: any) => state.openGames);
 
-export const selectAllOpenGamesJoinedByCurrentPlayer = createSelector(
+export const selectCurrentGame = createSelector(
+  [selectAllOpenGames, selectCurrentGameGlobalId],
+  (games: IGame[], currentGameGlobalId: string | undefined) => {
+    if (currentGameGlobalId) {
+      return games.find((g) => g.id == currentGameGlobalId);
+    }
+  }
+);
+export const selectAllOpenGamesIdsJoinedByCurrentPlayer = createSelector(
   [selectAllOpenGames],
   (openGames: IGame[]) => {
     const ids: string[] = [];
@@ -169,6 +214,14 @@ export const selectAllOpenGamesJoinedByCurrentPlayer = createSelector(
       }
     }
     return ids;
+  }
+);
+
+export const selectAllOpenGamesJoinedByCurrentPlayer = createSelector(
+  [selectAllOpenGames],
+  (openGames: IGame[]) => {
+    const ids: string[] = [];
+    return openGames.filter((g) => g.playerId >= 0);
   }
 );
 
@@ -223,6 +276,14 @@ export const openGamesSlice = createSlice({
     );
     builder.addCase(
       gameJoined.fulfilled,
+      (state, { payload }: { payload: IGame | undefined }) => {
+        if (payload) {
+          openGamesAdapter.upsertOne(state, payload);
+        }
+      }
+    );
+    builder.addCase(
+      playerWasGivenCards.fulfilled,
       (state, { payload }: { payload: IGame | undefined }) => {
         if (payload) {
           openGamesAdapter.upsertOne(state, payload);

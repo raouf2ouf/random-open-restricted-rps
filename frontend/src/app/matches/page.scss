@@ -1,0 +1,30 @@
+.play-page {
+  .game {
+    margin: 8px 0px;
+    width: 100%;
+    background-color: var(--background-color-light);
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    // border: 1px solid var(--background-color-light);
+    border: 1px solid rgba(var(--ion-color-primary-rgb), 0.3);
+    &.isplayer {
+      border-color: var(--ion-color-warning-shade);
+    }
+    .column {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-right: 8px;
+      color: var(--ion-color-primary);
+      .label {
+        color: var(--ion-color-light-shade);
+      }
+    }
+    button {
+      border-width: 0px;
+    }
+  }
+}

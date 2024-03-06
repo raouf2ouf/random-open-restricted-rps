@@ -10,6 +10,7 @@ import GAME_CONTRACT from "@/contracts/RestrictedRPSGame.json";
 import {
   fetchOpenGameInfo,
   gameJoined,
+  playerWasGivenCards,
   selectAllOpenGames,
 } from "@/store/openGames.slice";
 import { IGame } from "@/models/Game.interface";
@@ -63,6 +64,12 @@ const GameListener: React.FC<GameProps> = ({ gameAddress, gameGlobalId }) => {
             const joinedPlayerAddress = string32BytesToAddress(topics[2]);
             dispatch(
               gameJoined({ gameAddress, gameGlobalId, joinedPlayerAddress })
+            );
+            break;
+          case "PlayerWasGivenCards":
+            const playerId = Number(BigInt(topics[1]));
+            dispatch(
+              playerWasGivenCards({ gameAddress, gameGlobalId, playerId })
             );
             break;
         }

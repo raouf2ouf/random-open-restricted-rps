@@ -22,8 +22,9 @@ import { wTe } from "@/contracts";
 import { useWriteContract } from "wagmi";
 
 import GAME_CONTRACT from "@/contracts/RestrictedRPSGame.json";
-import { useAppDispatch } from "@/store/store";
 import { extractMessage, makeLoader, updateLoader } from "@/hooks/toast.utils";
+import { useAppDispatch } from "@/store/store";
+import { setCurrentGameGlobalId } from "@/store/playersState.slice";
 const { abi: GAME_ABI } = GAME_CONTRACT;
 
 type Props = {
@@ -61,15 +62,20 @@ const JoinGameModal: React.FC<Props> = ({ isOpen, onClose, game }) => {
       },
       {
         onSuccess: async () => {
-          updateLoader(
-            id,
-            <div>
-              Joined game <strong>{game.gameId}</strong> successfully!
-            </div>,
-            "success"
-          );
-          setLoading(false);
-          onClose();
+          setTimeout(() => {
+            updateLoader(
+              id,
+              <div>
+                Joined game <strong>{game.gameId}</strong> successfully!
+              </div>,
+              "success"
+            );
+            setLoading(false);
+            onClose();
+          }, 2000);
+          setTimeout(() => {
+            dispatch(setCurrentGameGlobalId(game.id));
+          }, 5000);
         },
         onError: (error) => {
           updateLoader(

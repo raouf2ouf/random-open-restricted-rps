@@ -174,6 +174,15 @@ export const selectCurrentGameGlobalId = (state: RootState) =>
 export const selectCurrentPlayerId = (state: RootState) =>
   state.playersState.currentPlayerId;
 
+export const selectCurrentPlayerState = createSelector(
+  [selectPlayersStateForCurrentGame, selectCurrentPlayerId],
+  (playerStates: PlayerState[], currentPlayerId: number) => {
+    if (currentPlayerId >= 0) {
+      return playerStates[currentPlayerId];
+    }
+  }
+);
+
 // Slice
 type ExtraState = {
   playerAddress?: string;

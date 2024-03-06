@@ -1,5 +1,4 @@
 import {
-  selectAllOpenGamesJoinedByCurrentPlayer,
   selectAllOpenGamesNotYetJoinedByCurrentPlayer,
   selectOpenGameById,
 } from "@/store/openGames.slice";

@@ -26,6 +26,7 @@ export function matchStateToText(result: MatchState) {
 
 export interface IMatch {
   id: string;
+  gameId: string;
   matchId: number;
   gameGlobalId: string;
   player1: number;
