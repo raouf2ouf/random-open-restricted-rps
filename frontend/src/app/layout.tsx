@@ -6,6 +6,11 @@ import Header from "@/ui/Header/Header";
 import LeftMenu from "@/ui/LeftMenu/LeftMenu";
 import TabsNav from "@/ui/TabsNav/TabsNav";
 import RightMenu from "@/ui/RightMenu/RightMenu";
+import {
+  FactoryListenerContainer,
+  GamesListenersContainer,
+} from "./DataListeners";
+import { ToastContainer } from "react-toastify";
 
 const font = Titillium_Web({ weight: ["400", "600"], subsets: ["latin"] });
 
@@ -24,6 +29,8 @@ export default function RootLayout({
       <body className={font.className}>
         <Providers>
           <div className="global-container">
+            <FactoryListenerContainer />
+            <GamesListenersContainer />
             <Header />
             <div className="global-content">
               <LeftMenu />
@@ -35,6 +42,11 @@ export default function RootLayout({
             </div>
           </div>
         </Providers>
+        <ToastContainer
+          theme="dark"
+          autoClose={5000}
+          position="bottom-center"
+        />
       </body>
     </html>
   );

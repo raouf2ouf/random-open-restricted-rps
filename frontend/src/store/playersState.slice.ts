@@ -1,9 +1,10 @@
+"use client";
 import { readContract, Config } from "@wagmi/core";
 import {
   PlayerState,
   buildPlayerStateId,
 } from "@/models/PlayerState.interface";
-import * as GAME_CONTRACT from "@/contracts/RestrictedRPSGame.json";
+import GAME_CONTRACT from "@/contracts/RestrictedRPSGame.json";
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -12,9 +13,11 @@ import {
 } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import { getMatchesData } from "@/api/local";
-import { buildGameId } from "@/models/Game.interface";
 import { ICard } from "@/models/Card.interface";
 import { updatePlayerAddressForGames } from "./openGames.slice";
+import { config } from "@/wagmi";
+
+const { abi: GAME_ABI } = GAME_CONTRACT;
 
 // API
 const getPlayersStates = async (
@@ -25,7 +28,7 @@ const getPlayersStates = async (
   const playersStates: PlayerState[] = [];
   const data = (await readContract(config, {
     address: gameAddress as `0x${string}`,
-    abi: GAME_CONTRACT.abi,
+    abi: GAME_ABI,
     functionName: "getPlayersState",
   })) as any[];
   for (let i = 0; i < data.length; i++) {
@@ -75,14 +78,12 @@ const enrichPlayerStateWithLockedCards = async (
 };
 
 export const fetchPlayersStateForGame = createAsyncThunk(
-  "playersState/updatePlayerState",
+  "playersState/fetchPlayersStateForGame",
   async (
     {
-      config,
       gameAddress,
       gameGlobalId,
     }: {
-      config: Config;
       gameAddress: string;
       gameGlobalId: string;
     },
@@ -120,8 +121,9 @@ export const updatePlayerState = createAsyncThunk(
 export const setPlayerAddress = createAsyncThunk(
   "playersState/setPlayerAddress",
   async (playerAddress: string, thunkAPI): Promise<string> => {
-    thunkAPI.dispatch(updatePlayerAddressForGames(playerAddress));
-    return playerAddress;
+    const address = playerAddress.toLowerCase();
+    thunkAPI.dispatch(updatePlayerAddressForGames(address));
+    return address;
   }
 );
 
@@ -163,13 +165,22 @@ export const selectPlayersStateForCurrentGame = createSelector(
   }
 );
 
+export const selectPlayerAddress = (state: RootState) =>
+  state.playersState.playerAddress;
+
+export const selectCurrentGameGlobalId = (state: RootState) =>
+  state.playersState.currentGameGlobalId;
+
+export const selectCurrentPlayerId = (state: RootState) =>
+  state.playersState.currentPlayerId;
+
 // Slice
 type ExtraState = {
   playerAddress?: string;
   currentGameGlobalId?: string;
   currentPlayerId: number;
 };
-export const playersStateSlice: any = createSlice({
+export const playersStateSlice = createSlice({
   name: "playersState",
   initialState: playersStateAdapter.getInitialState<ExtraState>({
     currentPlayerId: -1,
@@ -206,5 +217,5 @@ export const playersStateSlice: any = createSlice({
   },
 });
 
-export const { upsertPlayerState } = playersStateSlice.actions;
+export const {} = playersStateSlice.actions;
 export default playersStateSlice.reducer;

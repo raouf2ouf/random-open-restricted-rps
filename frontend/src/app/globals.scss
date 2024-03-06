@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "react-toastify/dist/ReactToastify.css";
 :root {
   --color-violet: #9488f0;
   --color-green: #6fdcba;
@@ -131,7 +132,7 @@ body {
   height: 100%;
   margin: 0px;
 
-  & > div {
+  & > div:first-child {
     height: 100%;
   }
 }
@@ -218,4 +219,9 @@ ol {
 
 li::marker {
   color: var(--ion-color-warning-shade);
+}
+
+.Toastify__spinner {
+  --toastify-spinner-color-empty-area: var(--ion-color-warning-shade);
+  --toastify-spinner-color: rgba(var(--ion-color-warning-rgb), 0.2);
 }

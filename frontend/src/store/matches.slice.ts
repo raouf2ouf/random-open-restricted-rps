@@ -1,9 +1,7 @@
+"use client";
 import { readContract, Config } from "@wagmi/core";
-import {
-  PlayerState,
-  buildPlayerStateId,
-} from "@/models/PlayerState.interface";
-import * as GAME_CONTRACT from "@/contracts/RestrictedRPSGame.json";
+import { buildPlayerStateId } from "@/models/PlayerState.interface";
+import GAME_CONTRACT from "@/contracts/RestrictedRPSGame.json";
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -15,11 +13,11 @@ import { IMatch, MatchState, buildMatchId } from "@/models/Match.interface";
 import {
   fetchPlayersStateForGame,
   updatePlayerState,
-  upsertPlayerState,
 } from "./playersState.slice";
-import { ICard } from "@/models/Card.interface";
-import { getMatchData, getMatchesData, removeMatchData } from "@/api/local";
-import { buildGameId } from "@/models/Game.interface";
+import { getMatchesData, removeMatchData } from "@/api/local";
+import { config } from "@/wagmi";
+
+const { abi: GAME_ABI } = GAME_CONTRACT;
 
 // API
 const getMatchesForGame = async (
@@ -30,7 +28,7 @@ const getMatchesForGame = async (
   const matches: IMatch[] = [];
   const data = (await readContract(config, {
     address: gameAddress as `0x${string}`,
-    abi: GAME_CONTRACT.abi,
+    abi: GAME_ABI,
     functionName: "getMatches",
   })) as any[];
   for (let i = 0; i < data.length; i++) {
@@ -56,11 +54,9 @@ export const fetchMatchesForGame = createAsyncThunk(
   "matches/fetchMatchesForGame",
   async (
     {
-      config,
       gameAddress,
       gameGlobalId,
     }: {
-      config: Config;
       gameAddress: string;
       gameGlobalId: string;
     },
@@ -93,7 +89,7 @@ export const fetchMatchesForGame = createAsyncThunk(
       }
     }
     await thunkAPI.dispatch(
-      fetchPlayersStateForGame({ config, gameAddress, gameGlobalId })
+      fetchPlayersStateForGame({ gameAddress, gameGlobalId })
     );
     return matches;
   }
@@ -103,16 +99,16 @@ export const closeOrCancelMatch = createAsyncThunk(
   async (match: IMatch, thunkAPI): Promise<IMatch> => {
     const state = thunkAPI.getState() as RootState;
     const { playerAddress } = state.playersState;
-    const playerState =
-      state.playersState.entities[
-        buildPlayerStateId(match.gameGlobalId, playerAddress)
-      ];
 
     if (playerAddress) {
       await removeMatchData(match.gameGlobalId, playerAddress, match.matchId);
-    }
-    if (playerState) {
-      thunkAPI.dispatch(updatePlayerState({ ...playerState }));
+      const playerState =
+        state.playersState.entities[
+          buildPlayerStateId(match.gameGlobalId, playerAddress)
+        ];
+      if (playerState) {
+        thunkAPI.dispatch(updatePlayerState({ ...playerState }));
+      }
     }
     return match;
   }

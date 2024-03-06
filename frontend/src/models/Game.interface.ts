@@ -1,54 +1,42 @@
-import { ICard } from "./Card.interface";
-import { IMatchData } from "./Match.interface";
-
 export type GameInfoArray = [
   bigint | undefined, // gameId
-  number | undefined, // nbrPlayers
   number | undefined, // nbrMatches
   bigint | undefined, // starCost
   bigint | undefined, // 1M cash cost
   bigint | undefined, // endtime
+  number[], // cards
   string[], // players
 ];
+
+export enum GameInfoArrayType {
+  GAME_ID = 0,
+  NBR_MATCHES,
+  STAR_COST,
+  CASH_COST,
+  ENDTIME,
+  CARDS,
+  PLAYERS,
+}
 
 export function buildGameId(
   chainId: number,
   gameAddress: string,
-  gameId: bigint
+  gameId: string
 ): string {
   return `${chainId}-${gameAddress.toLowerCase()}-${gameId}`;
 }
 
 export interface IGame {
   id: string;
-  gameId: bigint;
+  gameId: string;
   gameAddress: string;
-  nbrPlayers: number;
   nbrMatches: number;
   starCost: string;
   cashCost: string;
   endTimestamp: number;
   players: string[];
+  nbrRocks: number;
+  nbrPapers: number;
+  nbrScissors: number;
   playerId: number;
-}
-
-export function gameArrayToGame(
-  chainId: number,
-  gameAddress: string,
-  data: GameInfoArray,
-  playerAddress: string
-): IGame {
-  const players = data[6].map((addr) => addr.toLowerCase());
-  return {
-    id: buildGameId(chainId, gameAddress, data[0]!),
-    gameAddress,
-    gameId: data[0]!,
-    nbrPlayers: data[1]!,
-    nbrMatches: data[2]!,
-    starCost: data[3]!.toString(),
-    cashCost: data[4]!.toString(),
-    endTimestamp: Number(data[5]),
-    players,
-    playerId: players.findIndex((addr) => addr == playerAddress),
-  };
 }

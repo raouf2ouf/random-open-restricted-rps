@@ -1,0 +1,119 @@
+.join-game-modal {
+  background: var(--background-color-dark);
+  position: relative;
+  .modal-title {
+    text-align: center;
+    width: 100%;
+    span {
+      color: var(--ion-color-primary-shade);
+    }
+  }
+  footer {
+    justify-content: center !important;
+  }
+  .join-game-modal-loading {
+    width: calc(100% - 48px);
+    height: calc(100% - 16px);
+    position: absolute;
+    background: var(--background-color-dark);
+    opacity: 0.8;
+    z-index: 3;
+    .loader {
+      z-index: 4;
+      position: absolute;
+      top: calc(50% - 88px);
+      left: calc(50% - 21px);
+    }
+  }
+  .cost {
+    margin: 8px 0px;
+    height: 70px;
+    width: 100%;
+    background-color: var(--background-color-light);
+    display: flex;
+    align-items: center;
+    padding: 0px 8px;
+    &.cash-cost {
+      .what-you-get {
+        & .slider {
+          align-items: normal;
+        }
+      }
+    }
+    .what-you-get {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 0px 16px;
+      .cost-label {
+        margin-right: 16px;
+        color: var(--ion-color-light-shade);
+
+        width: 80px;
+        .label {
+          width: 50px;
+        }
+      }
+      & > div {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+    .what-you-pay {
+      display: flex;
+      align-items: center;
+      width: 100px;
+      text-align: center;
+      padding: 8px;
+      background-color: var(--background-color-dark);
+      color: var(--ion-color-light-shade);
+      & > div:first-child {
+        flex: 1;
+      }
+      .unit {
+        font-size: 10px;
+      }
+    }
+
+    &.cash-cost {
+      .what-you-get {
+        ion-range {
+          --bar-height: 8px;
+          --ion-color-contrast: var(--ion-background-color-dark) !important;
+        }
+        ion-range::part(pin) {
+          &::before {
+            content: none;
+          }
+          transform: scale(1);
+          top: -20px;
+        }
+      }
+    }
+    &.transaction-cost {
+      .cost-label {
+        width: auto;
+        .label {
+          width: auto;
+        }
+      }
+    }
+  }
+  .total {
+    margin: 16px;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    color: var(--ion-color-light-shade);
+    width: 100%;
+    .label {
+      text-align: center;
+      flex: 1;
+      &.primary {
+        color: var(--ion-color-primary-shade);
+      }
+    }
+  }
+}

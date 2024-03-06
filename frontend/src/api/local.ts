@@ -7,14 +7,16 @@ export async function clearMatchesData(id: string): Promise<void> {
 
 export async function getMatchesData(
   gameGlobalId: string,
-  wallet: string
+  wallet: string | undefined
 ): Promise<Record<number, IMatchData> | undefined> {
   let matchesData: Record<number, IMatchData> | undefined;
-  const matchesDataString = localStorage.getItem(
-    buildMatchesDataId(gameGlobalId, wallet)
-  );
-  if (matchesDataString) {
-    matchesData = JSON.parse(matchesDataString);
+  if (wallet) {
+    const matchesDataString = localStorage.getItem(
+      buildMatchesDataId(gameGlobalId, wallet)
+    );
+    if (matchesDataString) {
+      matchesData = JSON.parse(matchesDataString);
+    }
   }
   return matchesData;
 }
