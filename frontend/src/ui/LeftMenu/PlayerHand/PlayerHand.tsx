@@ -30,8 +30,10 @@ const PlayerHand: React.FC<Props> = ({}) => {
           );
         }
       } else {
-        toast.dismiss(toastId.current);
-        toastId.current = undefined;
+        if (toastId.current) {
+          toast.dismiss(toastId.current);
+          toastId.current = undefined;
+        }
       }
     } else {
       if (toastId.current) {

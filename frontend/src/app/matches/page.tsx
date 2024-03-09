@@ -3,34 +3,65 @@
 import { useAppSelector } from "@/store/store";
 import "./page.scss";
 import Tooltip from "@/ui/components/Tooltip/Tooltip";
-import { selectPlayerAddress } from "@/store/playersState.slice";
+import { selectCurrentGameGlobalId } from "@/store/playersState.slice";
+import PlayerOpenMatches from "./PlayerOpenMatches";
+import OpenMatches from "./OpenMatches";
+import PlayedMatches from "./PlayedMatches";
+import PlayerAnsweredMatches from "./PlayerAnsweredMatches";
+import MatchesAnsweredByPlayer from "./MatchesAnsweredByPlayer";
 function App() {
-  const playerAddress = useAppSelector((state) => selectPlayerAddress(state));
+  const currentGameGlobalId = useAppSelector((state) =>
+    selectCurrentGameGlobalId(state)
+  );
   return (
     <div className="page play-page">
-      {!playerAddress ? (
+      {!currentGameGlobalId ? (
         <div className="section">
           <div className="label">
-            <div>
-              Please connect your wallet and use a supported network to see
-              games.
-            </div>
+            <div>Please select a Game to check Matches</div>
             <Tooltip text="" />
           </div>
         </div>
       ) : (
         <>
-          <div className="section player-games">
+          <div className="section player-matches">
             <div className="label">
-              <div>Your Current Open Games</div>
+              <div>Your Open Matches</div>
               <Tooltip text="" />
             </div>
+            <PlayerOpenMatches />
           </div>
-          <div className="section join-game">
+
+          <div className="section to-close-matches">
             <div className="label">
-              <div>Join a Game to Play</div>
+              <div>Your Matches To Close</div>
               <Tooltip text="" />
             </div>
+            <PlayerAnsweredMatches />
+          </div>
+
+          <div className="section to-close-matches">
+            <div className="label">
+              <div>Matches That You Answered</div>
+              <Tooltip text="" />
+            </div>
+            <MatchesAnsweredByPlayer />
+          </div>
+
+          <div className="section to-close-matches">
+            <div className="label">
+              <div>Other Players&apos; Open Matches</div>
+              <Tooltip text="" />
+            </div>
+            <OpenMatches />
+          </div>
+
+          <div className="section to-close-matches">
+            <div className="label">
+              <div>All Played Matches</div>
+              <Tooltip text="" />
+            </div>
+            <PlayedMatches />
           </div>
         </>
       )}

@@ -15,6 +15,8 @@ import {
 } from "@/store/openGames.slice";
 import { IGame } from "@/models/Game.interface";
 import { string32BytesToAddress } from "@/contracts";
+import { fetchMatchesForGame, removeMatch } from "@/store/matches.slice";
+import { buildMatchId } from "@/models/Match.interface";
 
 const { abi: GAME_ABI } = GAME_CONTRACT;
 const { abi: FACTORY_ABI } = FACTORY_CONTRACT;
@@ -71,6 +73,19 @@ const GameListener: React.FC<GameProps> = ({ gameAddress, gameGlobalId }) => {
             dispatch(
               playerWasGivenCards({ gameAddress, gameGlobalId, playerId })
             );
+            break;
+          case "MatchCreated":
+            dispatch(fetchMatchesForGame({ gameAddress, gameGlobalId }));
+            break;
+          case "MatchCancelled":
+            const matchId = Number(BigInt(topics[2]));
+            dispatch(removeMatch(buildMatchId(gameGlobalId, matchId)));
+            break;
+          case "MatchAnswered":
+            dispatch(fetchMatchesForGame({ gameAddress, gameGlobalId }));
+            break;
+          case "MatchClosed":
+            dispatch(fetchMatchesForGame({ gameAddress, gameGlobalId }));
             break;
         }
       }

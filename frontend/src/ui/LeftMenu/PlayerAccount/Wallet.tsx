@@ -5,6 +5,8 @@ import { useAccount, useConnect } from "wagmi";
 import { Button } from "@nextui-org/react";
 import { useAppDispatch } from "@/store/store";
 import { setPlayerAddress } from "@/store/playersState.slice";
+import { fetchOpenGamesInfo } from "@/store/openGames.slice";
+import { useContractsContext } from "@/contexts/ContractsContext";
 type Props = {};
 
 const Wallet: React.FC<Props> = ({}) => {

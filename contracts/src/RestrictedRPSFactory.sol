@@ -33,13 +33,16 @@ contract RestrictedRPSFactory is Ownable {
     uint8 private _winningsCut = 1; // per 1000
     uint256 private _starCost = 1e13; // 0.00001
     uint256 private _m1CachCost = 1e13; // 0.00001
+    address private _rngProvider;
 
     /// @dev Mapping of banned players
     mapping(address player => bool banned) private _banned;
 
-    /// @dev games (100 games history)
+    /// @dev games (20 games history)
     address[_NBR_GAMES] private _games;
     uint256 private _lastGameId;
+
+    uint16[] private _rngRequests;
 
     ////////////////
     // Events
@@ -55,6 +58,8 @@ contract RestrictedRPSFactory is Ownable {
     error RestrictedRPSFactory_SendMore();
     error RestrictedRPSFactory_TooManyOpenGames();
     error RestrictedRPSFactory_DurationTooLong();
+    error notRngProvider();
+    error notExactNumberOfValues();
 
     ////////////////
     // Construcor
@@ -78,9 +83,51 @@ contract RestrictedRPSFactory is Ownable {
         _;
     }
 
+    modifier onlyRngProvider() {
+        if(msg.sender != _rngProvider) {
+            revert notRngProvider();
+        }
+        _;
+    }
+
     ////////////////
     // External
     ////////////////
+    function setRngProvider(address provider) external onlyOwner() {
+        _rngProvider = provider;
+    }
+
+    function requestRng(uint256 gameId, uint8 playerId) public {
+        uint8 realGameId = getRealGameId(gameId); 
+        if(msg.sender == _games[realGameId]) {
+            uint16 packed = (uint16(realGameId) << 8) | uint16(playerId);
+            _rngRequests.push(packed);
+        }
+    }
+
+    function fullfillRngs(uint8[6][] calldata rng) external onlyRngProvider() {
+        if(rng.length != _rngRequests.length) {
+            revert notExactNumberOfValues();
+        }
+        for(uint16 i = 0; i < rng.length; i++) {
+            uint16 packed = _rngRequests[i];
+            uint8 realGameId = uint8(packed >> 8);
+            uint8 playerId = uint8(packed);
+            RestrictedRPSGame(_games[realGameId]).givePlayerHand(playerId, rng[i]);
+        }
+        delete _rngRequests;
+    }
+
+    function getRngRequests() external view returns (uint16[] memory) {
+        return _rngRequests;
+    }
+
+    function givePlayersCards(address[] calldata games, uint8[] calldata playerIds, uint8[6][] calldata rng) external onlyRngProvider() {
+        for(uint8 i = 0; i < games.length; i++) {
+            RestrictedRPSGame(games[i]).givePlayerHand(playerIds[i], rng[i]);
+        }
+    }
+
     function getGame(uint256 gameId) external view returns (address) {
         uint8 realGameId = getRealGameId(gameId);
         return address(_games[realGameId]);
@@ -194,13 +241,6 @@ contract RestrictedRPSFactory is Ownable {
     ////////////////
     // Public
     ////////////////
-    function generateRandomNumberFromSeed(
-        uint256 seed,
-        uint8 range
-    ) public pure returns (uint8) {
-        return uint8(uint256(keccak256(abi.encodePacked(seed))) % range);
-    }
-
     function getRealGameId(uint256 gameId) public pure returns (uint8 realGameId) {
         realGameId = uint8(gameId % _NBR_GAMES);
     }

@@ -1,7 +1,7 @@
 import { Id, ToastContent, TypeOptions, toast } from "react-toastify";
 
 export function makeLoader(content: ToastContent<unknown>): Id {
-  return toast.loading(content);
+  return toast.loading(content, { autoClose: false });
 }
 
 export function updateLoader(

@@ -7,13 +7,13 @@ import {RestrictedRPSFactory} from "../src/RestrictedRPSFactory.sol";
 import {RestrictedRPSGame} from "../src/RestrictedRPSGame.sol";
 
 contract RestrictedRPSDeploy is Script {
-    function run() external returns (RestrictedRPSFactory) {
+    function run() external returns (RestrictedRPSFactory, address) {
         Config config = new Config();
 
-        (uint256 deployerKey, ) = config.activeNetworkConfig();
+        (uint256 deployerKey, address deployerAddress) = config.activeNetworkConfig();
         vm.startBroadcast(deployerKey);
         RestrictedRPSFactory restrictedRPSFactory = new RestrictedRPSFactory();
         vm.stopBroadcast();
-        return restrictedRPSFactory;
+        return (restrictedRPSFactory, deployerAddress);
     }
 }

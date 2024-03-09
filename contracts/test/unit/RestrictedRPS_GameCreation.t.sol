@@ -114,7 +114,7 @@ contract RestrictedRPS_GameCreationTest is TestUtils {
         );
 
         address player = PLAYERS[0];
-        vm.expectRevert(RestrictedRPSGame.RestrictedRPS_SendMore.selector);
+        vm.expectRevert(RestrictedRPSGame.SendMore.selector);
         vm.prank(player);
         game.joinGame{value: 1}();
     }
@@ -134,7 +134,7 @@ contract RestrictedRPS_GameCreationTest is TestUtils {
             game.joinGame{value: joiningCost}();
         }
 
-        vm.expectRevert(RestrictedRPSGame.RestrictedRPS_GameFull.selector);
+        vm.expectRevert(RestrictedRPSGame.GameFull.selector);
         vm.prank(PLAYERS[20]);
         game.joinGame{value: joiningCost}();
     }
@@ -152,19 +152,19 @@ contract RestrictedRPS_GameCreationTest is TestUtils {
 
         game.finishGame();
 
-        vm.expectRevert(RestrictedRPSGame.RestrictedRPS_GameNotOpen.selector);
+        vm.expectRevert(RestrictedRPSGame.GameNotOpen.selector);
         vm.startPrank(player);
         game.joinGame{value: joiningCost}();
         vm.stopPrank();
 
         game.computeRewards();
-        vm.expectRevert(RestrictedRPSGame.RestrictedRPS_GameNotOpen.selector);
+        vm.expectRevert(RestrictedRPSGame.GameNotOpen.selector);
         vm.startPrank(player);
         game.joinGame{value: joiningCost}();
         vm.stopPrank();
 
         game.closeGame();
-        vm.expectRevert(RestrictedRPSGame.RestrictedRPS_GameNotOpen.selector);
+        vm.expectRevert(RestrictedRPSGame.GameNotOpen.selector);
         vm.startPrank(player);
         game.joinGame{value: joiningCost}();
         vm.stopPrank();
@@ -180,7 +180,7 @@ contract RestrictedRPS_GameCreationTest is TestUtils {
         uint256 joiningCost = game.getBasicJoiningCost();
 
         vm.expectRevert(
-            RestrictedRPSGame.RestrictedRPS_DealerCannotJoin.selector
+            RestrictedRPSGame.DealerCannotJoin.selector
         );
         vm.prank(DEALER);
         game.joinGame{value: joiningCost}();
@@ -191,7 +191,7 @@ contract RestrictedRPS_GameCreationTest is TestUtils {
         uint256 joiningCost = game.getBasicJoiningCost();
 
         vm.expectRevert(
-            RestrictedRPSGame.RestrictedRPS_PlayerAlreadyJoined.selector
+            RestrictedRPSGame.PlayerAlreadyJoined.selector
         );
         vm.prank(PLAYERS[2]);
         game.joinGame{value: joiningCost}();

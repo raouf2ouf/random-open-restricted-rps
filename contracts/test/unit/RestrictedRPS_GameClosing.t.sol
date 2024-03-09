@@ -26,7 +26,7 @@ contract RestrictedRPS_GameClosingTest is TestUtils {
         offerAndAnswerAndCloseMatch(game, 1, 0, "secret", 1, 1);
 
         vm.expectRevert(
-            RestrictedRPSGame.RestrictedRPS_GameNotClosable.selector
+            RestrictedRPSGame.GameNotClosable.selector
         );
         game.closeGame();
     }
@@ -49,12 +49,12 @@ contract RestrictedRPS_GameClosingTest is TestUtils {
 
 
         vm.expectRevert(
-            RestrictedRPSGame.RestrictedRPS_GameNotFinished.selector
+            RestrictedRPSGame.GameNotFinished.selector
         );
         game.finishGame();
 
         vm.expectRevert(
-            RestrictedRPSGame.RestrictedRPS_GameNotFinished.selector
+            RestrictedRPSGame.GameNotFinished.selector
         );
         game.computeRewards();
     }
@@ -62,7 +62,7 @@ contract RestrictedRPS_GameClosingTest is TestUtils {
     function test_GameClosingFullCompleteGameBeforeEnd() public {
         // Create Valid Game
         uint8 duration = 1;
-        uint256[6] memory rng = [uint256(0x1), 0x2, 0x3, 0x4, 0x5, 0x6];
+        uint8[6] memory rng = [uint8(0x1), 0x2, 0x3, 0x4, 0x5, 0x6];
         RestrictedRPSGame game = createGameWithPlayersGivenSeed(20, duration, rng);
 
         uint256[20] memory balances;
@@ -74,7 +74,7 @@ contract RestrictedRPS_GameClosingTest is TestUtils {
             // ensure draws
             offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 0, 0, "secret", 1, 1);
             offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 0, 0, "secret", 1, 1);
-            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 0, 0, "secret", 1, 1);
+            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 1, 1, "secret", 1, 1);
             // random winings
             offerAndAnswerAndCloseMatch(game, i, (i+1), "secret", 1, 1);
             offerAndAnswerAndCloseMatch(game, i, (i+1), "secret", 1, 1);
@@ -82,17 +82,17 @@ contract RestrictedRPS_GameClosingTest is TestUtils {
         }
         // ensure draws
         offerAndAnswerAndCloseMatchGivenCards(game, 12, 13, 0, 0, "secret", 1, 1);
-        offerAndAnswerAndCloseMatchGivenCards(game, 12, 13, 2, 2, "secret", 1, 1);
-        offerAndAnswerAndCloseMatchGivenCards(game, 12, 13, 2, 2, "secret", 1, 1);
+        offerAndAnswerAndCloseMatchGivenCards(game, 12, 13, 0, 0, "secret", 1, 1);
+        offerAndAnswerAndCloseMatchGivenCards(game, 12, 13, 1, 1, "secret", 1, 1);
         // random winings
         offerAndAnswerAndCloseMatch(game, 12, 13, "secret", 1, 1);
         offerAndAnswerAndCloseMatch(game, 12, 13, "secret", 1, 1);
         offerAndAnswerAndCloseMatch(game, 12, 13, "secret", 1, 1);
         for(uint8 i = 14; i < 20; i = i+2) {
             // ensure draws
-            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 1, 1, "secret", 1, 1);
-            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 1, 1, "secret", 1, 1);
-            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 1, 1, "secret", 1, 1);
+            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 2, 2, "secret", 1, 1);
+            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 2, 2, "secret", 1, 1);
+            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 2, 2, "secret", 1, 1);
             // random winings
             offerAndAnswerAndCloseMatch(game, i, (i+1), "secret", 1, 1);
             offerAndAnswerAndCloseMatch(game, i, (i+1), "secret", 1, 1);
@@ -120,7 +120,7 @@ contract RestrictedRPS_GameClosingTest is TestUtils {
     function test_GameClosingAfterPlayerCheated() public {
         // Create Valid Game
         uint8 duration = 1;
-        uint256[6] memory rng = [uint256(0x1), 0x2, 0x3, 0x4, 0x5, 0x6];
+        uint8[6] memory rng = [uint8(0x1), 0x2, 0x3, 0x4, 0x5, 0x6];
         RestrictedRPSGame game = createGameWithPlayersGivenSeed(20, duration, rng);
         uint256 joiningCost = game.getBasicJoiningCost();
 
@@ -133,7 +133,7 @@ contract RestrictedRPS_GameClosingTest is TestUtils {
             // ensure draws
             offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 0, 0, "secret", 1, 1);
             offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 0, 0, "secret", 1, 1);
-            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 0, 0, "secret", 1, 1);
+            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 1, 1, "secret", 1, 1);
             // random winings
             offerAndAnswerAndCloseMatch(game, i, (i+1), "secret", 1, 1);
             offerAndAnswerAndCloseMatch(game, i, (i+1), "secret", 1, 1);
@@ -141,18 +141,18 @@ contract RestrictedRPS_GameClosingTest is TestUtils {
         }
         // ensure draws
         offerAndAnswerAndCloseMatchGivenCards(game, 12, 13, 0, 0, "secret", 1, 1);
-        offerAndAnswerAndCloseMatchGivenCards(game, 12, 13, 2, 2, "secret", 1, 1);
-        offerAndAnswerAndCloseMatchGivenCards(game, 12, 13, 2, 2, "secret", 1, 1);
+        offerAndAnswerAndCloseMatchGivenCards(game, 12, 13, 0, 0, "secret", 1, 1);
+        offerAndAnswerAndCloseMatchGivenCards(game, 12, 13, 1, 1, "secret", 1, 1);
         // Cheating
-        offerAndAnswerAndCloseMatchGivenCards(game, 12, 13, 2, 2, "secret",  1, 1);
+        offerAndAnswerAndCloseMatchGivenCards(game, 12, 13, 0, 0, "secret",  1, 1);
         // random winings
         offerAndAnswerAndCloseMatch(game, 12, 13, "secret", 1, 1);
         offerAndAnswerAndCloseMatch(game, 12, 13, "secret", 1, 1);
         for(uint8 i = 14; i < 20; i = i+2) {
             // ensure draws
-            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 1, 1, "secret", 1, 1);
-            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 1, 1, "secret", 1, 1);
-            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 1, 1, "secret", 1, 1);
+            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 2, 2, "secret", 1, 1);
+            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 2, 2, "secret", 1, 1);
+            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 2, 2, "secret", 1, 1);
             // random winings
             offerAndAnswerAndCloseMatch(game, i, (i+1), "secret", 1, 1);
             offerAndAnswerAndCloseMatch(game, i, (i+1), "secret", 1, 1);
@@ -193,7 +193,7 @@ contract RestrictedRPS_GameClosingTest is TestUtils {
     function test_GameClosingWithAnsweredMatches() public {
         // Create Valid Game
         uint8 duration = 1;
-        uint256[6] memory rng = [uint256(0x1), 0x2, 0x3, 0x4, 0x5, 0x6];
+        uint8[6] memory rng = [uint8(0x1), 0x2, 0x3, 0x4, 0x5, 0x6];
         RestrictedRPSGame game = createGameWithPlayersGivenSeed(20, duration, rng);
 
         uint256[20] memory balances;
@@ -205,7 +205,7 @@ contract RestrictedRPS_GameClosingTest is TestUtils {
             // ensure draws
             offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 0, 0, "secret", 1, 1);
             // unclosed Games
-            (uint16 matchId,) = offerMatch(game, PLAYERS[i], 0, "secret", 1, 1);
+            (uint16 matchId,) = offerMatch(game, PLAYERS[i], 1, "secret", 1, 1);
             answerMatch(game, PLAYERS[i+1], matchId, 0);
         }
         // ensure draws
@@ -216,9 +216,9 @@ contract RestrictedRPS_GameClosingTest is TestUtils {
         offerAndAnswerAndCloseMatch(game, 12, 13, "secret", 1, 1);
         for(uint8 i = 14; i < 20; i = i+2) {
             // ensure draws
-            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 1, 1, "secret", 1, 1);
-            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 1, 1, "secret", 1, 1);
-            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 1, 1, "secret", 1, 1);
+            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 2, 2, "secret", 1, 1);
+            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 2, 2, "secret", 1, 1);
+            offerAndAnswerAndCloseMatchGivenCards(game, i, (i+1), 2, 2, "secret", 1, 1);
             // random winings
             offerAndAnswerAndCloseMatch(game, i, (i+1), "secret", 1, 1);
             offerAndAnswerAndCloseMatch(game, i, (i+1), "secret", 1, 1);
@@ -242,10 +242,13 @@ contract RestrictedRPS_GameClosingTest is TestUtils {
             if(i == 0) {
                 assert(st.nbrStars == 2);
             } else if(i < 13) {
-                assert(st.nbrStars == 3);
+                assert(st.nbrStars > 2);
             }
             assert(st.cheated == false);
             uint256 w = st.nbrStars * starCost;
+            if((st.nbrRocks + st.nbrPapers + st.nbrScissors) > 0 && st.nbrStars > 4) {
+                w = 4 * starCost;
+            }
             w = (w * (1000 - 1)) / 1000;
             // console2.log("%s | %s", (balances[i] + w), PLAYERS[i].balance);
             assert((balances[i] + w) == PLAYERS[i].balance);

@@ -67,51 +67,55 @@ export const fetchMatchesForGame = createAsyncThunk(
       .playerAddress;
     const matches = await getMatchesForGame(config, gameAddress, gameGlobalId);
     const matchesData = await getMatchesData(gameGlobalId, playerAddress);
-    if (matchesData) {
+    if (playerAddress && matchesData) {
       for (const match of matches) {
-        if (
-          playerAddress &&
-          (match.result == MatchState.UNDECIDED ||
-            match.result == MatchState.ANSWERED)
-        ) {
-          const data = matchesData[match.matchId];
-          if (data) {
-            if (
-              match.result == MatchState.UNDECIDED ||
-              match.result == MatchState.ANSWERED
-            ) {
-              match.secret = data.secret;
-              match.player1Card = data.card;
-            } else {
-              await removeMatchData(gameGlobalId, playerAddress, match.matchId);
-            }
+        const data = matchesData[match.matchId];
+        if (data) {
+          if (
+            match.result == MatchState.UNDECIDED ||
+            match.result == MatchState.ANSWERED
+          ) {
+            match.secret = data.secret;
+            match.player1Card = data.card;
+          } else {
+            await removeMatchData(gameGlobalId, playerAddress, match.matchId);
           }
         }
       }
     }
     await thunkAPI.dispatch(
-      fetchPlayersStateForGame({ gameAddress, gameGlobalId })
+      fetchPlayersStateForGame({ gameAddress, gameGlobalId, matches })
     );
     return matches;
   }
 );
 export const closeOrCancelMatch = createAsyncThunk(
   "matches/cancelMatch",
-  async (match: IMatch, thunkAPI): Promise<IMatch> => {
+  async (
+    {
+      id,
+      gameGlobalId,
+      match,
+    }: { id: string; gameGlobalId: string; match: IMatch },
+    thunkAPI
+  ): Promise<string> => {
     const state = thunkAPI.getState() as RootState;
-    const { playerAddress } = state.playersState;
+    const playerAddress = state.playersState.playerAddress;
 
     if (playerAddress) {
-      await removeMatchData(match.gameGlobalId, playerAddress, match.matchId);
-      const playerState =
+      await removeMatchData(gameGlobalId, playerAddress, match.matchId);
+      let playerState =
         state.playersState.entities[
-          buildPlayerStateId(match.gameGlobalId, playerAddress)
+          buildPlayerStateId(gameGlobalId, playerAddress)
         ];
       if (playerState) {
+        playerState = { ...playerState };
+        playerState.nbrStarsLocked -= match.player1Bet;
+
         thunkAPI.dispatch(updatePlayerState({ ...playerState }));
       }
     }
-    return match;
+    return id;
   }
 );
 
@@ -131,7 +135,7 @@ export const selectMatchesForCurrentGame = createSelector(
   }
 );
 
-export const selectOpenMatchesForCurrentGame = createSelector(
+export const selectOpenMatchesIdsForCurrentGameOfPlayer = createSelector(
   [
     selectMatchesForCurrentGame,
     (state) => {
@@ -139,13 +143,17 @@ export const selectOpenMatchesForCurrentGame = createSelector(
     },
   ],
   (matches: IMatch[], playerId: number) => {
-    return matches.filter(
-      (m) => m.player1 == playerId && m.result == MatchState.UNDECIDED
-    );
+    const ids: string[] = [];
+    for (const m of matches) {
+      if (m.player1 == playerId && m.result == MatchState.UNDECIDED) {
+        ids.push(m.id);
+      }
+    }
+    return ids;
   }
 );
 
-export const selectOpenMatchesForCurrentGameOfNotPlayer = createSelector(
+export const selectOpenMatchesIdsForCurrentGameOfNotPlayer = createSelector(
   [
     selectMatchesForCurrentGame,
     (state) => {
@@ -153,13 +161,17 @@ export const selectOpenMatchesForCurrentGameOfNotPlayer = createSelector(
     },
   ],
   (matches: IMatch[], playerId: number) => {
-    return matches.filter(
-      (m) => m.player1 != playerId && m.result == MatchState.UNDECIDED
-    );
+    const ids: string[] = [];
+    for (const m of matches) {
+      if (m.player1 != playerId && m.result == MatchState.UNDECIDED) {
+        ids.push(m.id);
+      }
+    }
+    return ids;
   }
 );
 
-export const selectAnsweredMatchesForCurrentGameOfPlayer = createSelector(
+export const selectAnsweredMatchesIdsForCurrentGameOfPlayer = createSelector(
   [
     selectMatchesForCurrentGame,
     (state) => {
@@ -167,16 +179,60 @@ export const selectAnsweredMatchesForCurrentGameOfPlayer = createSelector(
     },
   ],
   (matches: IMatch[], playerId: number) => {
-    return matches.filter(
-      (m) => m.player1 == playerId && m.result == MatchState.ANSWERED
-    );
+    const ids: string[] = [];
+    for (const m of matches) {
+      if (m.player1 == playerId && m.result == MatchState.ANSWERED) {
+        ids.push(m.id);
+      }
+    }
+    return ids;
   }
 );
 
-export const selectPlayedMatchesForCurrentGame = createSelector(
+export const selectAnsweredMatchesIdsForCurrentGameByPlayer = createSelector(
+  [
+    selectMatchesForCurrentGame,
+    (state) => {
+      return state.playersState.currentPlayerId;
+    },
+  ],
+  (matches: IMatch[], playerId: number) => {
+    const ids: string[] = [];
+    for (const m of matches) {
+      if (m.player2 == playerId && m.result == MatchState.ANSWERED) {
+        ids.push(m.id);
+      }
+    }
+    return ids;
+  }
+);
+
+export const selectPlayedMatchesIdsForCurrentGame = createSelector(
   [selectMatchesForCurrentGame],
   (matches: IMatch[]) => {
-    return matches.filter((m) => m.result >= MatchState.DRAW);
+    const ids: string[] = [];
+    for (const m of matches) {
+      if (m.result >= MatchState.DRAW) {
+        ids.push(m.id);
+      }
+    }
+    return ids;
+  }
+);
+
+export const selectPlayedMatchesIdsForCurrentGameOfPlayer = createSelector(
+  [selectMatchesForCurrentGame, (state) => state.playersState.currentPlayerId],
+  (matches: IMatch[], currentPlayerId: number) => {
+    const ids: string[] = [];
+    for (const m of matches) {
+      if (
+        m.result >= MatchState.DRAW &&
+        (m.player1 == currentPlayerId || m.player2 == currentPlayerId)
+      ) {
+        ids.push(m.id);
+      }
+    }
+    return ids;
   }
 );
 // Slice
@@ -184,16 +240,20 @@ type ExtraState = {};
 export const matchesSlice = createSlice({
   name: "matches",
   initialState: matchesAdapter.getInitialState<ExtraState>({}),
-  reducers: {},
+  reducers: {
+    removeMatch: (state, { payload }: { payload: string }) => {
+      matchesAdapter.removeOne(state, payload);
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchMatchesForGame.fulfilled, (state, { payload }) => {
       matchesAdapter.upsertMany(state, payload);
     });
     builder.addCase(closeOrCancelMatch.fulfilled, (state, { payload }) => {
-      matchesAdapter.upsertOne(state, payload);
+      matchesAdapter.removeOne(state, payload);
     });
   },
 });
 
-export const {} = matchesSlice.actions;
+export const { removeMatch } = matchesSlice.actions;
 export default matchesSlice.reducer;

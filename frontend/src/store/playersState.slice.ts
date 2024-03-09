@@ -16,6 +16,8 @@ import { getMatchesData } from "@/api/local";
 import { ICard } from "@/models/Card.interface";
 import { updatePlayerAddressForGames } from "./openGames.slice";
 import { config } from "@/wagmi";
+import { IGame } from "@/models/Game.interface";
+import { IMatch, MatchState } from "@/models/Match.interface";
 
 const { abi: GAME_ABI } = GAME_CONTRACT;
 
@@ -54,21 +56,32 @@ const getPlayersStates = async (
 
 const enrichPlayerStateWithLockedCards = async (
   currentPlayerState: PlayerState,
-  playerAddress: string
+  playerAddress: string,
+  matches: IMatch[]
 ): Promise<void> => {
-  const matchesData = await getMatchesData(
-    currentPlayerState.gameGlobalId,
-    playerAddress
-  );
+  const matchesData =
+    (await getMatchesData(currentPlayerState.gameGlobalId, playerAddress)) ||
+    {};
   currentPlayerState.lockedRocks = 0;
   currentPlayerState.lockedPapers = 0;
   currentPlayerState.lockedScissors = 0;
-  if (matchesData) {
-    for (const m in matchesData) {
-      const match = matchesData[m];
-      if (match.card == ICard.ROCK) {
+  for (const match of matches) {
+    const matchData = matchesData[match.matchId];
+    if (matchData) {
+      if (matchData.card == ICard.ROCK) {
         currentPlayerState.lockedRocks++;
-      } else if (match.card == ICard.PAPER) {
+      } else if (matchData.card == ICard.PAPER) {
+        currentPlayerState.lockedPapers++;
+      } else {
+        currentPlayerState.lockedScissors++;
+      }
+    } else if (
+      match.result == MatchState.ANSWERED &&
+      match.player2 == currentPlayerState.playerId
+    ) {
+      if (match.player2Card == ICard.ROCK) {
+        currentPlayerState.lockedRocks++;
+      } else if (match.player2Card == ICard.PAPER) {
         currentPlayerState.lockedPapers++;
       } else {
         currentPlayerState.lockedScissors++;
@@ -83,9 +96,11 @@ export const fetchPlayersStateForGame = createAsyncThunk(
     {
       gameAddress,
       gameGlobalId,
+      matches,
     }: {
       gameAddress: string;
       gameGlobalId: string;
+      matches: IMatch[] | undefined;
     },
     thunkAPI
   ): Promise<PlayerState[]> => {
@@ -96,11 +111,20 @@ export const fetchPlayersStateForGame = createAsyncThunk(
       gameAddress,
       gameGlobalId
     );
+    if (!matches) {
+      matches = Object.values(
+        (thunkAPI.getState() as RootState).matches.entities
+      ).filter((m) => m.gameGlobalId == gameGlobalId);
+    }
     const currentPlayerState = playersStates.find(
       (s) => s.playerAddress == playerAddress
     );
     if (playerAddress && currentPlayerState) {
-      await enrichPlayerStateWithLockedCards(currentPlayerState, playerAddress);
+      await enrichPlayerStateWithLockedCards(
+        currentPlayerState,
+        playerAddress,
+        matches
+      );
     }
     return playersStates;
   }
@@ -111,8 +135,15 @@ export const updatePlayerState = createAsyncThunk(
   async (playerState: PlayerState, thunkAPI): Promise<PlayerState> => {
     const playerAddress = (thunkAPI.getState() as RootState).playersState
       .playerAddress;
+    const matches = Object.values(
+      (thunkAPI.getState() as RootState).matches.entities
+    ).filter((m) => m.gameGlobalId == playerState.gameGlobalId);
     if (playerAddress) {
-      await enrichPlayerStateWithLockedCards(playerState, playerAddress);
+      await enrichPlayerStateWithLockedCards(
+        playerState,
+        playerAddress,
+        matches
+      );
     }
     return playerState;
   }

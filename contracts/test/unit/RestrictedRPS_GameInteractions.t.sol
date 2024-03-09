@@ -90,7 +90,7 @@ contract RestrictedRPS_GameCreationTest is TestUtils {
 
         vm.expectRevert(
             RestrictedRPSGame
-                .RestrictedRPS_PlayerHasOfferedTooManyMatches
+                .PlayerHasOfferedTooManyMatches
                 .selector
         );
         offerMatch(game, player1, uint8(RestrictedRPSGame.Card.SCISSORS), "secret", 1, 2);

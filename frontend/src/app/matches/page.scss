@@ -1,5 +1,5 @@
 .play-page {
-  .game {
+  .match {
     margin: 8px 0px;
     width: 100%;
     background-color: var(--background-color-light);
@@ -7,10 +7,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    // border: 1px solid var(--background-color-light);
     border: 1px solid rgba(var(--ion-color-primary-rgb), 0.3);
-    &.isplayer {
-      border-color: var(--ion-color-warning-shade);
+    &.to-close {
+      border: 1px solid rgba(var(--ion-color-warning-rgb), 0.6);
+      button {
+        border-width: 0px;
+      }
     }
     .column {
       display: flex;
@@ -22,9 +24,18 @@
       .label {
         color: var(--ion-color-light-shade);
       }
+      .data {
+        .small-card-container {
+          margin: 0px !important;
+          & > div {
+            width: 20px !important;
+            height: 30px !important;
+          }
+        }
+      }
     }
     button {
-      border-width: 0px;
+      --nextui-danger-opacity: 0.8;
     }
   }
 }

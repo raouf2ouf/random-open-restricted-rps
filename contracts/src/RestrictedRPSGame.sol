@@ -115,35 +115,35 @@ contract RestrictedRPSGame {
     ///////////////////
     // Errors
     ///////////////////
-    error RestrictedRPS_OnlyFactory();
+    error OnlyFactory();
 
-    error RestrictedRPS_GameNotOpen();
-    error RestrictedRPS_GameNotClosed();
-    error RestrictedRPS_GameNotFinished();
-    error RestrictedRPS_GameFull();
-    error RestrictedRPS_CannotResetOpenGame();
+    error GameNotOpen();
+    error GameNotClosed();
+    error GameNotFinished();
+    error GameFull();
+    error CannotResetOpenGame();
 
-    error RestrictedRPS_SendMore();
+    error SendMore();
 
-    error RestrictedRPS_OnlyDealer();
-    error RestrictedRPS_DealerCannotJoin();
+    error OnlyDealer();
+    error DealerCannotJoin();
 
-    error RestrictedRPS_PlayerAlreadyJoined();
-    error RestrictedRPS_PlayerBanned();
-    error RestrictedRPS_InvalidPlayerId();
-    error RestrictedRPS_NotAPlayer();
-    error RestrictedRPS_NotTheRightPlayer();
+    error PlayerAlreadyJoined();
+    error PlayerBanned();
+    error InvalidPlayerId();
+    error NotAPlayer();
+    error NotTheRightPlayer();
 
-    error RestrictedRPS_InvalidMatchId();
-    error RestrictedRPS_MatchAlreadyPlayed();
-    error RestrictedRPS_MatchNotAnswered();
-    error RestrictedRPS_AnsweredMatchCannotBeCancelled();
-    error RestrictedRPS_WrongCardHash();
-    error RestrictedRPS_PlayerHasOfferedTooManyMatches();
-    error RestrictedRPS_NotEnoughAvailableStars();
-    error RestrictedRPS_CannotAnswerYourOwnMatch();
+    error InvalidMatchId();
+    error MatchAlreadyPlayed();
+    error MatchNotAnswered();
+    error AnsweredMatchCannotBeCancelled();
+    error WrongCardHash();
+    error PlayerHasOfferedTooManyMatches();
+    error NotEnoughAvailableStars();
+    error CannotAnswerYourOwnMatch();
 
-    error RestrictedRPS_GameNotClosable();
+    error GameNotClosable();
 
     ///////////////////
     // Constructor
@@ -173,41 +173,41 @@ contract RestrictedRPSGame {
     ///////////////////
     modifier isNotBanned() {
         if (_factory.isBanned(msg.sender)) {
-            revert RestrictedRPS_PlayerBanned();
+            revert PlayerBanned();
         }
         _;
     }
     modifier onlyDealer() {
         if (_dealer != msg.sender) {
-            revert RestrictedRPS_OnlyDealer();
+            revert OnlyDealer();
         }
         _;
     }
 
     modifier onlyFactory() {
         if (msg.sender != address(_factory)) {
-            revert RestrictedRPS_OnlyFactory();
+            revert OnlyFactory();
         }
         _;
     }
 
     modifier isValidPlayerId(uint8 playerId) {
         if (playerId == 0 || playerId > _nbrPlayers) {
-            revert RestrictedRPS_InvalidPlayerId();
+            revert InvalidPlayerId();
         }
         _;
     }
 
     modifier isValidMatchId(uint16 matchId) {
         if (matchId >= _nbrMatches) {
-            revert RestrictedRPS_InvalidMatchId();
+            revert InvalidMatchId();
         }
         _;
     }
 
     modifier isClosed() {
         if (_state != GameState.CLOSED) {
-            revert RestrictedRPS_GameNotClosed();
+            revert GameNotClosed();
         }
         _;
     }
@@ -413,7 +413,7 @@ contract RestrictedRPSGame {
         uint8 duration
     ) external onlyFactory {
         if (_state != GameState.CLOSED) {
-            revert RestrictedRPS_CannotResetOpenGame();
+            revert CannotResetOpenGame();
         }
         _nbrMatches = 0;
         delete _matches;
@@ -440,24 +440,24 @@ contract RestrictedRPSGame {
     function joinGame() external payable isNotBanned returns (uint8 playerId) {
         address player = msg.sender;
         if (msg.value < getBasicJoiningCost()) {
-            revert RestrictedRPS_SendMore();
+            revert SendMore();
         }
         if (_state != GameState.OPEN) {
-            revert RestrictedRPS_GameNotOpen();
+            revert GameNotOpen();
         }
         if (_dealer == player) {
-            revert RestrictedRPS_DealerCannotJoin();
+            revert DealerCannotJoin();
         }
 
         // Make sure he has not already joined
         if(_playerAddressToId[player] != 0) {
-            revert RestrictedRPS_PlayerAlreadyJoined();
+            revert PlayerAlreadyJoined();
         }
 
         uint8 realPlayerId = _nbrPlayers;
         playerId = realPlayerId + 1;
         if (playerId > _MAX_PLAYERS) {
-            revert RestrictedRPS_GameFull();
+            revert GameFull();
         }
 
 
@@ -471,6 +471,8 @@ contract RestrictedRPSGame {
         _players[realPlayerId] = playerState;
         _nbrPlayers++;
 
+        _factory.requestRng(_gameId, playerId);
+
         emit GameJoined(playerId, player);
     }
 
@@ -482,7 +484,7 @@ contract RestrictedRPSGame {
         Match memory m;
         uint8 playerId = _playerAddressToId[msg.sender];
         if (playerId == 0) {
-            revert RestrictedRPS_NotAPlayer();
+            revert NotAPlayer();
         }
         uint8 realPlayerId = playerId - 1; 
 
@@ -490,13 +492,13 @@ contract RestrictedRPSGame {
 
         uint8 nbrOfferedMatches = player1State.nbrOfferedMatches + 1;
         if (nbrOfferedMatches > _MAX_OFFERED_MATCHES_PER_PLAYER) {
-            revert RestrictedRPS_PlayerHasOfferedTooManyMatches();
+            revert PlayerHasOfferedTooManyMatches();
         }
 
         if (
             (player1Bet + player1State.nbrStarsLocked) > (player1State.nbrStars)
         ) {
-            revert RestrictedRPS_NotEnoughAvailableStars();
+            revert NotEnoughAvailableStars();
         }
 
         m.realPlayer1Id = realPlayerId;
@@ -517,11 +519,11 @@ contract RestrictedRPSGame {
         Match memory m = _matches[matchId];
         uint8 playerId = _playerAddressToId[msg.sender];
         if (m.realPlayer1Id != (playerId - 1)) {
-            revert RestrictedRPS_NotTheRightPlayer();
+            revert NotTheRightPlayer();
         }
         MatchState result = m.result;
         if (result != MatchState.UNDECIDED) {
-            revert RestrictedRPS_AnsweredMatchCannotBeCancelled();
+            revert AnsweredMatchCannotBeCancelled();
         }
         _players[m.realPlayer1Id].nbrStarsLocked -= m.player1Bet;
         _matches[matchId].result = MatchState.CANCELLED;
@@ -535,15 +537,15 @@ contract RestrictedRPSGame {
     ) external isValidMatchId(matchId) {
         uint8 playerId = _playerAddressToId[msg.sender];
         if (playerId == 0) {
-            revert RestrictedRPS_NotAPlayer();
+            revert NotAPlayer();
         }
         uint8 realPlayerId = playerId - 1;
         Match storage m = _matches[matchId];
         if (realPlayerId == m.realPlayer1Id) {
-            revert RestrictedRPS_CannotAnswerYourOwnMatch();
+            revert CannotAnswerYourOwnMatch();
         }
         if (m.result != MatchState.UNDECIDED) {
-            revert RestrictedRPS_MatchAlreadyPlayed();
+            revert MatchAlreadyPlayed();
         }
         PlayerState memory player2State = _players[realPlayerId];
 
@@ -551,7 +553,7 @@ contract RestrictedRPSGame {
             (m.player2Bet + player2State.nbrStarsLocked) >
             (player2State.nbrStars)
         ) {
-            revert RestrictedRPS_NotEnoughAvailableStars();
+            revert NotEnoughAvailableStars();
         }
         m.realPlayer2Id = realPlayerId;
         m.player2Card = card;
@@ -567,11 +569,11 @@ contract RestrictedRPSGame {
     ) external isValidMatchId(matchId) {
         Match memory m = _matches[matchId];
         if (m.result != MatchState.ANSWERED) {
-            revert RestrictedRPS_MatchNotAnswered();
+            revert MatchNotAnswered();
         }
         bytes32 cardHash = keccak256(bytes.concat(bytes1(card), bytes(secret)));
         if (m.player1Hash != cardHash) {
-            revert RestrictedRPS_WrongCardHash();
+            revert WrongCardHash();
         }
 
         Card player1Card = Card(card);
@@ -606,7 +608,7 @@ contract RestrictedRPSGame {
         emit MatchClosed(matchId);
     }
 
-    function givePlayerHand(uint8 playerId, uint256[6] memory rng) external isValidPlayerId(playerId) {
+    function givePlayerHand(uint8 playerId, uint8[6] memory rng) external isValidPlayerId(playerId) onlyFactory {
         uint8[8] memory deck;
         uint8[3] memory playerCards;
         uint8[3] memory cards = _cards;
@@ -625,7 +627,7 @@ contract RestrictedRPSGame {
         }
 
         for(uint8 i; i < 6; i++) {
-            uint8 randIdx = _factory.generateRandomNumberFromSeed(rng[i], nbrCards);
+            uint8 randIdx = rng[i] % nbrCards;
             cardType = deck[randIdx];
             playerCards[cardType]++;
 
@@ -677,7 +679,7 @@ contract RestrictedRPSGame {
 
     function finishGame() external {
         if(!isFinished()) {
-            revert RestrictedRPS_GameNotFinished();
+            revert GameNotFinished();
         }
         _closeUnclosedMatches();
         _state = GameState.FINISHED;
@@ -685,7 +687,7 @@ contract RestrictedRPSGame {
 
     function computeRewards() external {
         if (_state != GameState.FINISHED) {
-            revert RestrictedRPS_GameNotFinished();
+            revert GameNotFinished();
         }
         uint8 nbrPlayers = _nbrPlayers;
         uint8 nbrPlayersWhoCheated;
@@ -726,7 +728,7 @@ contract RestrictedRPSGame {
 
     function closeGame() external {
         if(_state != GameState.COMPUTED_REWARDS) {
-            revert RestrictedRPS_GameNotClosable();
+            revert GameNotClosable();
         }
         uint8 nbrPlayers = _nbrPlayers;
         for (uint8 i; i < nbrPlayers; i++) {

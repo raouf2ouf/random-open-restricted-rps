@@ -41,7 +41,11 @@ contract TestUtils is Test {
 
     function setUp() public {
         RestrictedRPSDeploy restrictedRPSScript = new RestrictedRPSDeploy();
-        restrictedRPSFactory = restrictedRPSScript.run();
+
+        (RestrictedRPSFactory factory, address deployer) = restrictedRPSScript.run();
+        restrictedRPSFactory = factory;
+        vm.prank(deployer);
+        restrictedRPSFactory.setRngProvider(DEALER);
     }
 
     modifier dealerFunded() {
@@ -70,11 +74,11 @@ contract TestUtils is Test {
         uint8 nbrPlayers,
         uint8 duration
     ) public playersFunded(nbrPlayers) returns (RestrictedRPSGame game) {
-        uint256[6] memory rng = [uint256(0x1), 0x2, 0x3, 0x4, 0x5, 0x6];
+        uint8[6] memory rng = [uint8(0x1), 0x2, 0x3, 0x4, 0x5, 0x6];
         game = createGameWithPlayersGivenSeed(nbrPlayers, duration, rng);
     }
 
-    function createGameWithPlayersGivenSeed(uint8 nbrPlayers, uint8 duration, uint256[6] memory rng) public playersFunded(nbrPlayers) returns (RestrictedRPSGame game) {
+    function createGameWithPlayersGivenSeed(uint8 nbrPlayers, uint8 duration, uint8[6] memory rng) public playersFunded(nbrPlayers) returns (RestrictedRPSGame game) {
         (uint256 gameId, ) = createGame(duration, GAME_CREATION_FEE);
 
         game = RestrictedRPSGame(restrictedRPSFactory.getGame(gameId));
@@ -86,8 +90,10 @@ contract TestUtils is Test {
 
             // (,,,,, uint8[3] memory cards, ) = game.getGameInfo();
             // console2.log("cards: %s R| %s P| %s S", cards[0], cards[1], cards[2]);
+            uint8[6][] memory rngs = new uint8[6][](1);
+            rngs[0] = rng;
             vm.prank(DEALER);
-            game.givePlayerHand(i+1, rng);
+            restrictedRPSFactory.fullfillRngs(rngs);
             // RestrictedRPSGame.PlayerState memory st = game.getPlayerState(i+1);
             // console2.log("cards of player: %s R | %s P | %s S", uint8(st.nbrRocks), uint8(st.nbrPapers), uint8(st.nbrScissors));
         }
@@ -105,7 +111,7 @@ contract TestUtils is Test {
     function getRandomPlayerCard(RestrictedRPSGame game, uint8 p) public view returns (uint8) {
         RestrictedRPSGame.PlayerState memory st = game.getPlayerState(p+1);
         bool noCard = true;
-        uint8 card = restrictedRPSFactory.generateRandomNumberFromSeed(block.timestamp, 2); // 0 to 2;
+        uint8 card = uint8(uint256(keccak256(abi.encodePacked(block.timestamp))) % 2); // 0 to 2;
         require(st.nbrRocks > 0 || st.nbrScissors > 0 || st.nbrPapers > 0, "Player has no cards left!");
         while(noCard) {
             if(card == uint8(RestrictedRPSGame.Card.ROCK) && st.nbrRocks > 0) {
