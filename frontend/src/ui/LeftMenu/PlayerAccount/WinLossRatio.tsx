@@ -14,10 +14,10 @@ const WinLossRation: React.FC<Props> = () => {
 
   useEffect(() => {
     // const total = histories.length;
-    const total = 0;
-    let won = 0,
-      draw = 0,
-      lost = 0;
+    const total = 10;
+    let won = 3,
+      draw = 3,
+      lost = 4;
     // for (const history of histories) {
     //   const paidAmount = BigInt(history.paidAmount);
     //   const rewards = BigInt(history.rewards);

@@ -6,7 +6,7 @@ function App() {
   return (
     <div className="page home-page">
       <div className="section">
-        <div className="title">Ethpoir (Restricted Random RPS)</div>
+        <div className="title">Random Open Restricted RPS (ROR RPS)</div>
         <div className="subtitle">
           A <em>Prouvably fair</em> multiplayer <em>Card Game</em>
         </div>
@@ -64,24 +64,13 @@ function App() {
             >
               Kaiji
             </Link>
-            . The name Ethpoir is a bad joke mixing{" "}
-            <Link
-              isExternal
-              showAnchorIcon
-              href="https://kaiji.fandom.com/wiki/Espoir"
-            >
-              Espoir
-            </Link>{" "}
-            (the name of the ship where the game was played) and ETH (it is also
-            how my little niece pronounces Espoir).
           </p>
         </div>
 
         <div className="subsection-title">How to play</div>
         <div className="content">
           <p>
-            You need some <strong>Polygon Mumbai</strong> test Matic to play. A
-            game starts when a game master provides a hidden shuffled Deck of{" "}
+            A game starts when a game master provides a hidden shuffled Deck of{" "}
             <em>36 cards</em> (12 Rock, 12 Paper, 12 Scissors) [the fairness of
             this deck (and of the game master) will be checked by the blockchain
             at the end of game]. You start by joining a game and providing a{" "}
@@ -96,10 +85,10 @@ function App() {
               <em>3 stars: </em> used to bet when you play a card. They are
               redeemable for collateral at the end of the game.
             </li>
-            <li>
+            {/* <li>
               <em>In-game Cash: </em> used to buy and sell cards. You can only
               redeem stars if you have no cards in you hand!
-            </li>
+            </li> */}
           </ul>
           <p>
             After which you can <em>offer</em> or <em>answer</em> a match: a

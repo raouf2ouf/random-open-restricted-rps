@@ -15,7 +15,7 @@ import { ToastContainer } from "react-toastify";
 const font = Titillium_Web({ weight: ["400", "600"], subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Ethpoir",
+  title: "RoR-RPS",
   description: "Restricted Random RPS",
 };
 

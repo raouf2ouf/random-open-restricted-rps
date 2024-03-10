@@ -2,13 +2,13 @@
 
 **TLDR;** A Prouvably fair multiplayer Card Game based on Rock Paper Scissors. Players join by providing a collateral and recieve <em>6 random cards</em> (a collection of Rock, Paper, Scissors cards) and <em>3 stars</em>. Players play matches by chosing a card and betting a number of stars. At the end of the game, if a player has no more cards, he can redeem his stars for collateral. The fairness of the game is proven by the blockchain and any cheating is automatically detected.
 
-**Disclamer:** The previous version of this game [https://github.com/raouf2ouf/restricted-rps](https://github.com/raouf2ouf/restricted-rps) won the second best project at the [Encode x Lightlink Hackathon]() and the new verson is submitted to the Encode x Polkadot Hackathon 24Q1. Details on the changes can be found [here](#changes-for-the-encode-x-polkadot-hackathon).
+**Disclamer:** The previous version of this game [https://github.com/raouf2ouf/restricted-rps](https://github.com/raouf2ouf/restricted-rps) won the second best project at the [Encode x Lightlink Hackathon](https://www.youtube.com/watch?v=woy4CyvCDZ0) and the new verson is submitted to the Encode x Polkadot Hackathon 24Q1. Details on the changes can be found [here](#changes-for-the-encode-x-polkadot-hackathon).
 
 ## Links
 
-- Live demo [restricted-rps.com]()
-- Demonstration video [Demo Video]()
-- Pitch Deck [Slides Presentation]()
+- Demonstration video [Demo Video](https://youtu.be/rwrWZq7YR-4)
+- Pitch Deck [Slides Presentation](https://docs.google.com/presentation/d/1-XU40PIicHXs5LdCSIBivUVxs1Patt7LHyILz2L2L8I/edit?usp=sharing)
+- Example of a Game [EVM example](https://testnet.ftmscan.com/address/0x87e391f1a399b598ba8d8da820d8606045056a97) [Substrate example](https://testnet.ftmscan.com/address/0x87e391f1a399b598ba8d8da820d8606045056a97)
 
 ## Table Of Content
 
@@ -64,7 +64,7 @@ The game is composed of two smart-contract:
 
 Along with these smart contract, there is a frontend to simplify contract interaction and a set of Acurast jobs that handle automation and Rng providing.
 
-The following schemas describes how Acurast and Getblock are using to generate the Cards of a player:
+The following schemas describes how Acurast and Getblock are used to generate the Cards of a player:
 ![join-game-architecture](./assets/join-game-architecture.png)
 
 ## Known Issues
