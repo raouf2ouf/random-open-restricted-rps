@@ -8,12 +8,12 @@ import Chain from "./Chain/Chain";
 import GameSelector from "./GameSelector/GameSelector";
 
 const Header: React.FC<Props> = ({}) => {
-  const version = "v0.1";
+  const version = "v0.2";
   return (
     <div id="header">
       <div className="logo">
         <div id="logo-text">
-          <span>Eth</span>poir
+          <span>ROR</span>-RPS
         </div>
         <div id="version" className="hide-md">
           {version}

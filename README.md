@@ -4,6 +4,8 @@
 
 **Disclamer:** The previous version of this game [https://github.com/raouf2ouf/restricted-rps](https://github.com/raouf2ouf/restricted-rps) won the second best project at the [Encode x Lightlink Hackathon](https://www.youtube.com/watch?v=woy4CyvCDZ0) and the new verson is submitted to the Encode x Polkadot Hackathon 24Q1. Details on the changes can be found [here](#changes-for-the-encode-x-polkadot-hackathon).
 
+![ror-rps](./assets/ror-rps.png)
+
 ## Links
 
 - Demonstration video [Demo Video](https://youtu.be/rwrWZq7YR-4)
