@@ -30,7 +30,7 @@ contract RestrictedRPSFactory is Ownable {
     uint8 private constant _NBR_CARDS_PER_BYTE = 8 / _NBR_BITS_PER_CARD;
 
     uint256 private _gameCreationFee = 1; // 0
-    uint8 private _winningsCut = 1; // per 1000
+    uint8 private _winningsCut = 10; // per 1000
     uint256 private _starCost = 1e13; // 0.00001
     uint256 private _m1CachCost = 1e13; // 0.00001
     address private _rngProvider;

@@ -1,9 +1,9 @@
-import { http, createConfig } from "wagmi";
-import { foundry, lightlinkPegasus, polygonMumbai } from "wagmi/chains";
+import { http, createConfig, webSocket } from "wagmi";
+import { fantomTestnet, lightlinkPegasus, polygonMumbai } from "wagmi/chains";
 import { injected } from "wagmi/connectors";
 
 export const config = createConfig({
-  chains: [foundry, polygonMumbai, lightlinkPegasus],
+  chains: [fantomTestnet, polygonMumbai, lightlinkPegasus],
   connectors: [
     injected(),
     // coinbaseWallet({ appName: "Create Wagmi" }),
@@ -11,7 +11,9 @@ export const config = createConfig({
   ],
   ssr: true,
   transports: {
-    [foundry.id]: http(),
+    [fantomTestnet.id]: webSocket(
+      "wss://go.getblock.io/2b0f21a86beb426a8215a8b369f0043c"
+    ),
     [polygonMumbai.id]: http(),
     [lightlinkPegasus.id]: http(),
   },

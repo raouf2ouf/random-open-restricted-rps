@@ -1,6 +1,5 @@
 import { Select, SelectItem, Selection } from "@nextui-org/react";
-import { memo, useEffect, useMemo } from "react";
-import { useAccount, useChainId, useChains, useSwitchChain } from "wagmi";
+import { useChainId, useSwitchChain } from "wagmi";
 
 import "./Chain.scss";
 type Props = {};

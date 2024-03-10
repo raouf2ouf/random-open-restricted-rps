@@ -9,7 +9,12 @@ import {
   useEffect,
   useState,
 } from "react";
-import { foundry, lightlinkPegasus, polygonMumbai } from "viem/chains";
+import {
+  fantomTestnet,
+  foundry,
+  lightlinkPegasus,
+  polygonMumbai,
+} from "viem/chains";
 import { useChainId } from "wagmi";
 
 type ContractsContextProps = {
@@ -48,10 +53,10 @@ export const ContractsProvider: React.FC<Props> = ({ children }) => {
       let address: string | undefined;
       let collateral: string | undefined;
       switch (chainId) {
-        case foundry.id:
-          address = process.env.NEXT_PUBLIC_FOUNDRY_FACTORY_ADDRESS;
-          collateral = process.env.NEXT_PUBLIC_FOUNDRY_COLLATERAL_UNIT;
-          break;
+        // case foundry.id:
+        //   address = process.env.NEXT_PUBLIC_FOUNDRY_FACTORY_ADDRESS;
+        //   collateral = process.env.NEXT_PUBLIC_FOUNDRY_COLLATERAL_UNIT;
+        //   break;
         case lightlinkPegasus.id:
           address = process.env.NEXT_PUBLIC_LIGHTLINK_PEGASUS_FACTORY_ADDRESS;
           collateral =
@@ -60,6 +65,10 @@ export const ContractsProvider: React.FC<Props> = ({ children }) => {
         case polygonMumbai.id:
           address = process.env.NEXT_PUBLIC_MUMBAI_FACTORY_ADDRESS;
           collateral = process.env.NEXT_PUBLIC_MUMBAI_COLLATERAL_UNIT;
+          break;
+        case fantomTestnet.id:
+          address = process.env.NEXT_PUBLIC_FANTOM_TESTNET_FACTORY_ADDRESS;
+          collateral = process.env.NEXT_PUBLIC_FANTOM_TESTNET_COLLATERAL_UNIT;
           break;
       }
       if (address && collateral) {
