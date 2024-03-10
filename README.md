@@ -46,10 +46,8 @@ You start by joining a game and providing a <em>collateral</em> for which you wi
 - <em>6 cards: </em> a collection of Rock, Paper, Scissors cards.
 - <em>3 stars: </em> used to bet when you play a card. They are redeemable for collateral at the end of the game.
 - ~~<em>In-game Cash: </em> used to buy and sell cards. You can only redeem stars if you have no cards in you hand!~~ (functionnality removed for now as the smart-contract is too big).
-  After which you can <em>offer</em> or <em>answer</em> a match: a
-  match is offered by placing a hidden card and a bet (number of
-  stars). Other players can answer your match by placing a card
-  and bet at least equal to the minimum you indicated.
+
+After which you can <em>offer</em> or <em>answer</em> a match: a match is offered by placing a hidden card and a bet (number of stars). Other players can answer your match by placing a card and bet at least equal to the minimum you indicated.
 
 ### How to win [or lose]
 
@@ -59,6 +57,29 @@ You start by joining a game and providing a <em>collateral</em> for which you wi
 
 ## Architecture and How it Works
 
+The game is composed of two smart-contract:
+
+- `RestrictedRPSFactory`: handles game creation (deploys or resets an instance of the `RestrictedRPSGame` contract), collateral redeeming, and banning of cheaters.
+- `RestrictedRPSGame`: handles everything related to a game, from joining to matches along with cheat detection.
+
+Along with these smart contract, there is a frontend to simplify contract interaction and a set of Acurast jobs that handle automation and Rng providing.
+
+The following schemas describes how Acurast and Getblock are using to generate the Cards of a player:
+![join-game-architecture](./assets/join-game-architecture.png)
+
 ## Known Issues
 
+- <u>**Acurast HttpPOST:**</u> There is currently an issue with Acurast Jobs, the `HttpPost` method sends a `GET` request rather than a `POST` request. this makes the job unabled to have up-to-date information on players to give the correct `RNG`. A workaround is currently in place only for `Fantom Testnet` as getting the gas fees is relatively easy for this chain.
+
 ## Roadmap
+
+This project (previous and current version) was started 4 weeks ago (mid february 2024). There is sill a lot of work to bring this game to the public, mainly:
+
+- **2024Q2**:
+  - Optimise frontend wallet connection: the blockchain change detection is currently unreliable.
+  - Optimise Ink Smart Contracts: My knowledge of Ink is still limited, I believe the smart contract can be better optimized.
+  - Deploy more Acurast Jobs and have a dedicated smartphone for our jobs.
+  - Improve the reliability of the winning/loss aggregated data for players.
+- **2024Q3/4**:
+  - Public launch with Tournaments including prizes and NFTs.
+  - Include Partners from Web3 and from the RPS community.
