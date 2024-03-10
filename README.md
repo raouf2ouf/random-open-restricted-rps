@@ -2,7 +2,7 @@
 
 **TLDR;** A Prouvably fair multiplayer Card Game based on Rock Paper Scissors. Players join by providing a collateral and recieve <em>6 random cards</em> (a collection of Rock, Paper, Scissors cards) and <em>3 stars</em>. Players play matches by chosing a card and betting a number of stars. At the end of the game, if a player has no more cards, he can redeem his stars for collateral. The fairness of the game is proven by the blockchain and any cheating is automatically detected.
 
-**Disclamer:** The previous version of this game [https://github.com/raouf2ouf/restricted-rps](https://github.com/raouf2ouf/restricted-rps) won the second best project at the [Encode x Lightlink Hackathon]() and the new verson is submitted to the Encode x Polkadot Hackathon 24Q1. Details on the changes can be found [here](#changes-for-the-polkadot-hackathon).
+**Disclamer:** The previous version of this game [https://github.com/raouf2ouf/restricted-rps](https://github.com/raouf2ouf/restricted-rps) won the second best project at the [Encode x Lightlink Hackathon]() and the new verson is submitted to the Encode x Polkadot Hackathon 24Q1. Details on the changes can be found [here](#changes-for-the-encode-x-polkadot-hackathon).
 
 ## Links
 
@@ -12,13 +12,13 @@
 
 ## Table Of Content
 
-- [Changes for the Polkadot hackathon](#changes-for-the-polkadot-hackathon)
+- [Changes for the Polkadot hackathon](#changes-for-the-encode-x-polkadot-hackathon)
 - [Game Introduction and How to Play](#game-introduction-and-how-to-play)
 - [Architecture and How it Works](#architecture-and-how-it-works)
 - [Known Issues](#known-issues)
 - [Roadmap](#roadmap)
 
-## Changes for the Polkadot hackathon
+## Changes for the Encode x Polkadot Hackathon
 
 The previous version of this game submitted for the Encode x LightLink hackathon (won second best project) had various shortcommings pointed out by the judges, mainly, **scaling**. In the new version, we use **Acurast.com** and **GetBlock.io** to address these weaknesses. The following table explains the main changes:
 
@@ -31,6 +31,31 @@ The previous version of this game submitted for the Encode x LightLink hackathon
 | Scaling Blockchains support | In this version, only 1 blockchain (LightLink) was supported.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | By using Acurast as a chain-agnostic RNG provider along with Getblock RPCs we can support multiple evm and polkadot chains. Currently, we deployed the game for: Fantom Testnet, Azero Testnet, Polygon Mumbai, LightLink Testnet. Furthermore, deploying to a new blockchain is relatively straightforward as it only requires creating a Getblock RPC API keys and Acurast Jobs (along with integrating the proper wallet on the frontend).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 ## Game Introduction and How to Play
+
+### Introduction
+
+[Rock, Paper, Scissors [RPS]]("https://en.wikipedia.org/wiki/Rock_paper_scissors) is one the most iconic and played games all over the world
+(there is even an [RPS World Championship](https://wrpsa.com/rock-paper-scissors-tournaments/). However, there was always a debate on wether it is a game of <em>chance</em> or a game of <em>skill</em> ?
+
+<em>Random Open Restricted RPS</em> [RORRPS] is a variant that adds complexity and amplifies the role of chance and skill. It is inspired by the famous [Resctricted RPS](https://kaiji.fandom.com/wiki/Restricted_Rock_Paper_Scissors) from the manga [Kaiji](https://kaiji.fandom.com/wiki/Kaiji_Wiki) along with the [E-Card](https://kaiji.fandom.com/wiki/E-Card) game from the same manga. By making the player cards public, chosing a card amounts to playing E-Card.
+
+### How to play
+
+You start by joining a game and providing a <em>collateral</em> for which you will recieve:
+
+- <em>6 cards: </em> a collection of Rock, Paper, Scissors cards.
+- <em>3 stars: </em> used to bet when you play a card. They are redeemable for collateral at the end of the game.
+- ~~<em>In-game Cash: </em> used to buy and sell cards. You can only redeem stars if you have no cards in you hand!~~ (functionnality removed for now as the smart-contract is too big).
+  After which you can <em>offer</em> or <em>answer</em> a match: a
+  match is offered by placing a hidden card and a bet (number of
+  stars). Other players can answer your match by placing a card
+  and bet at least equal to the minimum you indicated.
+
+### How to win [or lose]
+
+- You <em>win a game</em> when you have <em>at least 3 stars </em> and <em>no cards</em> at the end of the game. For each star above 3 you will recieve additional collateral.
+- You <em>lose a game </em> when you have <em>less than 3 stars</em> at the end of the game (you will still recieve part of your collateral for each star you have).
+- You <em>draw a game</em> when you have more than 3 stars and at <em>least 1 card</em>. You will only recieve the collateral you used.
 
 ## Architecture and How it Works
 
